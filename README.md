@@ -54,7 +54,7 @@ PhishSentinel attacks this gap with signals that are visible **from the moment o
 | Engine execution | Sequential | **All engines run in parallel** |
 | IP Rollback prevention | ✅ | ✅ Enhanced |
 | Domain age check | ✅ Single sender domain | ✅ **All links checked** |
-| ML engine | ✅ RF | ✅ RF + feature explainability |
+| ML engine | ✅ Random Forest | ✅ Random Forest + feature explainability |
 | **Homograph / IDN detection** | ❌ | ✅ Unicode lookalike detection |
 | **Typosquatting detection** | ❌ | ✅ Levenshtein vs 50 brands |
 | **URL shortener expansion** | ❌ | ✅ Full redirect chain |
