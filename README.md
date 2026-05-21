@@ -55,7 +55,7 @@ PhishSentinel attacks this gap with signals that are visible **from the moment o
 | IP Rollback prevention | ✅ | ✅ Enhanced |
 | Domain age check | ✅ Single sender domain | ✅ **All links checked** |
 | ML engine | ✅ Random Forest | ✅ Random Forest + feature explainability |
-| **Homograph / IDN detection** | ❌ | ✅ Unicode lookalike detection |
+| **Homograph(lookalike domain 'letters in diff lang') / IDN detection** | ❌ | ✅ Unicode lookalike detection |
 | **Typosquatting detection** | ❌ | ✅ Levenshtein vs 50 brands |
 | **URL shortener expansion** | ❌ | ✅ Full redirect chain |
 | **SSL certificate age** | ❌ | ✅ New cert = suspicious |
