@@ -97,25 +97,25 @@ PhishSentinel attacks this gap with signals that are visible **from the moment o
 ║         FastAPI Backend  ·  127.0.0.1:5000  (loopback only)       ║
 ║                                                                   ║
 ║   asyncio.gather() — all engines fire simultaneously              ║
-║   ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌─────────────┐  ║
-║   │ ML Engine  │ │  Domain    │ │ Heuristic  │ │   Header    │  ║
-║   │            │ │  Engine    │ │  Engine    │ │   Engine    │  ║
-║   │ TF-IDF +   │ │            │ │            │ │             │  ║
-║   │ Random     │ │ • Raw-IP   │ │ • Homograph│ │ • SPF check │  ║
-║   │ Forest     │ │ • WHOIS age│ │ • Typosquat│ │ • DKIM check│  ║
-║   │            │ │ • DNS check│ │ • Shortener│ │ • DMARC     │  ║
-║   │ Score: 0-  │ │ • SSL cert │ │   expand   │ │ • Reply-To  │  ║
-║   │ 100        │ │ • Subd.dep │ │ • Keyword  │ │   mismatch  │  ║
-║   │ Weight:0.70│ │ • Susp. TLD│ │   injection│ │ • Display   │  ║
-║   └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ │   name spoof│  ║
-║         │              │              │         └──────┬──────┘  ║
-║         └──────────────┴──────────────┴────────────────┘         ║
-║                                  │                               ║
+║   ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌─────────────┐    ║
+║   │ ML Engine  │ │  Domain    │ │ Heuristic  │ │   Header    │    ║
+║   │            │ │  Engine    │ │  Engine    │ │   Engine    │    ║
+║   │ TF-IDF +   │ │            │ │            │ │             │    ║
+║   │ Random     │ │ • Raw-IP   │ │ • Homograph│ │ • SPF check │    ║
+║   │ Forest     │ │ • WHOIS age│ │ • Typosquat│ │ • DKIM check│    ║
+║   │            │ │ • DNS check│ │ • Shortener│ │ • DMARC     │    ║
+║   │ Score: 0-  │ │ • SSL cert │ │   expand   │ │ • Reply-To  │    ║
+║   │ 100        │ │ • Subd.dep │ │ • Keyword  │ │   mismatch  │    ║
+║   │ Weight:0.70│ │ • Susp. TLD│ │   injection│ │ • Display   │    ║
+║   └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ │   name spoof│    ║
+║         │              │              │         └──────┬──────┘   ║
+║         └──────────────┴──────────────┴────────────────┘          ║
+║                                  │                                ║
 ║                        scorer.aggregate()                         ║
 ║                    Weighted average + escalation                  ║
-║                                  │                               ║
-║             { overall_score, overall_risk, colour,               ║
-║               engine_scores, all_findings, detail }              ║
+║                                  │                                ║
+║             { overall_score, overall_risk, colour,                ║
+║               engine_scores, all_findings, detail }               ║
 ╚═══════════════════════════════════════════════════════════════════╝
 ```
 
