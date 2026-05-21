@@ -34,8 +34,8 @@
 Traditional anti-phishing tools rely on **reputation blocklists** — databases of known bad domains that are maintained by vendors like Google Safe Browsing or Microsoft SmartScreen. These work well for *old* threats but fail completely for **zero-day phishing**:
 
 ```
-Hour 0:  Attacker registers secure-paypa1-login.xyz  ($1 on Namecheap)
-Hour 0:  Attacker provisions a Let's Encrypt TLS cert  (free, takes 30 seconds)
+Hour 0:  Attacker registers secure-paypa1-login.xyz  ($1 on Namecheap/Godaddy)
+Hour 0:  Attacker provisions a Let's Encrypt TLS cert.  (free, takes 30 seconds)
 Hour 1:  Mass phishing emails sent to 500,000 targets
 Hour 8:  Google Safe Browsing finally flags the domain
           ↑
