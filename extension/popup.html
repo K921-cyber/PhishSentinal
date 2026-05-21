@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PhishSentinel</title>
+<style>
+/* ─── Hard-reset — Chrome collapses popup without explicit html min-width ─── */
+html, body {
+  width     : 400px;
+  min-width : 400px;
+  max-width : 400px;
+  margin    : 0;
+  padding   : 0;
+  box-sizing: border-box;
+}
+
+/* ─── No external fonts — CSP in MV3 blocks fonts.googleapis.com in popups ── */
+/* Using system UI stack that looks modern on Windows, Mac, Linux */
+:root {
+  --sans : -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --mono : 'Consolas', 'Cascadia Code', 'Courier New', monospace;
+
+  --bg        : #0f1117;
+  --card      : #16191f;
+  --card2     : #1c1f27;
+  --border    : #252830;
+  --border2   : #2e323d;
+  --text      : #f0f2f7;
+  --text2     : #8b90a0;
+  --text3     : #545868;
+  --accent    : #6366f1;
+  --accent-dim: rgba(99,102,241,.15);
+  --red       : #ef4444;
+  --red-dim   : rgba(239,68,68,.14);
+  --yellow    : #f59e0b;
+  --yellow-dim: rgba(245,158,11,.14);
+  --green     : #22c55e;
+  --green-dim : rgba(34,197,94,.14);
+  --radius    : 10px;
+  --radius-sm : 7px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family    : var(--sans);
+  background     : var(--bg);
+  color          : var(--text);
+  overflow-x     : hidden;
+  padding-bottom : 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────────── */
+.hdr {
+  display      : flex;
+  align-items  : center;
+  gap          : 11px;
+  padding      : 14px 16px 12px;
+  background   : var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.hdr-icon {
+  width           : 36px;
+  height          : 36px;
+  border-radius   : 9px;
+  background      : var(--accent-dim);
+  border          : 1px solid rgba(99,102,241,.3);
+  display         : flex;
+  align-items     : center;
+  justify-content : center;
+  font-size       : 19px;
+  flex-shrink     : 0;
+}
+.hdr-name {
+  font-size  : 14px;
+  font-weight: 700;
+  color      : var(--text);
+  line-height: 1.2;
+}
+.hdr-sub {
+  font-size  : 10px;
+  color      : var(--text3);
+  font-weight: 500;
+  margin-top : 2px;
+}
+.version-pill {
+  margin-left  : auto;
+  font-size    : 10px;
+  font-family  : var(--mono);
+  color        : var(--accent);
+  background   : var(--accent-dim);
+  border       : 1px solid rgba(99,102,241,.25);
+  padding      : 3px 9px;
+  border-radius: 20px;
+  flex-shrink  : 0;
+  white-space  : nowrap;
+}
+
+/* ─── Scan Button ─────────────────────────────────────────────────────────── */
+.scan-wrap { padding: 14px 16px 0; }
+#scan-btn {
+  width          : 100%;
+  padding        : 11px 16px;
+  background     : var(--accent);
+  border         : none;
+  border-radius  : var(--radius-sm);
+  color          : #fff;
+  font-family    : var(--sans);
+  font-size      : 13px;
+  font-weight    : 700;
+  cursor         : pointer;
+  transition     : all .2s;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  gap            : 7px;
+}
+#scan-btn:hover:not(:disabled) {
+  background : #5153cc;
+  transform  : translateY(-1px);
+  box-shadow : 0 4px 14px rgba(99,102,241,.4);
+}
+#scan-btn:active:not(:disabled) { transform: translateY(0); }
+#scan-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ─── Status ──────────────────────────────────────────────────────────────── */
+#status {
+  margin     : 9px 16px 0;
+  font-size  : 11px;
+  font-family: var(--mono);
+  color      : var(--text3);
+  min-height : 14px;
+}
+
+/* ─── Escalation Banner ───────────────────────────────────────────────────── */
+.escalation-badge {
+  display      : none;
+  margin       : 12px 16px 0;
+  padding      : 9px 12px;
+  border-radius: var(--radius-sm);
+  background   : var(--red-dim);
+  border       : 1px solid rgba(239,68,68,.3);
+  font-size    : 11px;
+  color        : #fca5a5;
+  line-height  : 1.6;
+  font-weight  : 500;
+}
+
+/* ─── Threat Score Card ───────────────────────────────────────────────────── */
+#gauge-wrap {
+  display      : none;
+  margin       : 12px 16px 0;
+  background   : var(--card);
+  border       : 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow     : hidden;
+}
+.gauge-inner {
+  padding    : 16px;
+  display    : flex;
+  align-items: center;
+  gap        : 16px;
+}
+.gauge-circle {
+  flex-shrink    : 0;
+  width          : 72px;
+  height         : 72px;
+  border-radius  : 50%;
+  border         : 3px solid var(--border2);
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  justify-content: center;
+  transition     : all .4s;
+}
+.gauge-score {
+  font-size  : 26px;
+  font-weight: 800;
+  font-family: var(--mono);
+  line-height: 1;
+  transition : color .4s;
+}
+.gauge-score-sub {
+  font-size  : 9px;
+  color      : var(--text3);
+  margin-top : 2px;
+  font-family: var(--mono);
+}
+.gauge-right { flex: 1; min-width: 0; }
+.gauge-label {
+  font-size    : 14px;
+  font-weight  : 700;
+  margin-bottom: 8px;
+  transition   : color .4s;
+}
+.gauge-bar-track {
+  height       : 6px;
+  border-radius: 99px;
+  background   : var(--border2);
+  overflow     : hidden;
+}
+.gauge-bar-fill {
+  height       : 100%;
+  width        : 0%;
+  border-radius: 99px;
+  transition   : width 1s cubic-bezier(.4,0,.2,1);
+}
+.gauge-meta {
+  display        : flex;
+  justify-content: space-between;
+  margin-top     : 5px;
+  font-size      : 10px;
+  color          : var(--text3);
+  font-family    : var(--mono);
+}
+
+/* ─── Engine Grid ─────────────────────────────────────────────────────────── */
+#engines-wrap {
+  display      : none;
+  margin       : 10px 16px 0;
+  background   : var(--card);
+  border       : 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow     : hidden;
+}
+.engines-title {
+  padding       : 9px 14px 7px;
+  font-size     : 10px;
+  font-weight   : 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color         : var(--text3);
+  border-bottom : 1px solid var(--border);
+}
+.engine-grid {
+  display             : grid;
+  grid-template-columns: 1fr 1fr;
+  gap                 : 1px;
+  background          : var(--border);
+}
+.engine-row {
+  display       : flex;
+  flex-direction: column;
+  gap           : 6px;
+  padding       : 11px 13px;
+  background    : var(--card);
+}
+.engine-top {
+  display        : flex;
+  align-items    : center;
+  justify-content: space-between;
+}
+.engine-name {
+  font-size  : 10.5px;
+  font-weight: 600;
+  color      : var(--text2);
+}
+.engine-val {
+  font-size  : 15px;
+  font-weight: 800;
+  font-family: var(--mono);
+  transition : color .3s;
+}
+.engine-bar-track {
+  height       : 4px;
+  border-radius: 99px;
+  background   : var(--border2);
+  overflow     : hidden;
+}
+.engine-bar-fill {
+  height       : 100%;
+  width        : 0%;
+  border-radius: 99px;
+  transition   : width .8s ease;
+}
+
+/* ─── Findings ────────────────────────────────────────────────────────────── */
+#findings-wrap {
+  display      : none;
+  margin       : 10px 16px 0;
+  background   : var(--card);
+  border       : 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow     : hidden;
+  max-height   : 190px;
+  overflow-y   : auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.findings-hdr {
+  padding       : 9px 14px 7px;
+  font-size     : 10px;
+  font-weight   : 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color         : var(--text3);
+  border-bottom : 1px solid var(--border);
+  position      : sticky;
+  top           : 0;
+  background    : var(--card);
+  z-index       : 1;
+}
+.finding {
+  display      : flex;
+  align-items  : flex-start;
+  gap          : 9px;
+  padding      : 8px 14px;
+  border-bottom: 1px solid var(--border);
+  animation    : fadeUp .22s ease both;
+}
+.finding:last-child { border-bottom: none; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: none; }
+}
+.finding-icon { font-size: 13px; line-height: 1.7; flex-shrink: 0; }
+.finding-text { font-size: 11.5px; color: var(--text2); line-height: 1.65; }
+
+/* ─── Link Table ──────────────────────────────────────────────────────────── */
+#links-wrap {
+  display      : none;
+  margin       : 10px 16px 0;
+  background   : var(--card);
+  border       : 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow     : hidden;
+}
+.links-hdr {
+  padding       : 9px 14px 7px;
+  font-size     : 10px;
+  font-weight   : 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color         : var(--text3);
+  border-bottom : 1px solid var(--border);
+}
+.links-col-hdr {
+  display             : grid;
+  grid-template-columns: 1fr 48px 60px;
+  gap                 : 6px;
+  padding             : 6px 14px;
+  font-size           : 9.5px;
+  font-weight         : 700;
+  color               : var(--text3);
+  background          : var(--card2);
+  border-bottom       : 1px solid var(--border);
+  letter-spacing      : .5px;
+  text-transform      : uppercase;
+}
+.links-scroll {
+  max-height   : 150px;
+  overflow-y   : auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+.link-row {
+  display             : grid;
+  grid-template-columns: 1fr 48px 60px;
+  gap                 : 6px;
+  padding             : 7px 14px;
+  border-bottom       : 1px solid var(--border);
+  align-items         : center;
+}
+.link-row:last-child { border-bottom: none; }
+.link-row:hover { background: var(--card2); }
+.link-url {
+  font-family  : var(--mono);
+  font-size    : 10px;
+  color        : var(--text2);
+  white-space  : nowrap;
+  overflow     : hidden;
+  text-overflow: ellipsis;
+}
+.link-age {
+  font-family: var(--mono);
+  font-size  : 10px;
+  color      : var(--text3);
+  text-align : right;
+}
+.link-risk { text-align: right; }
+
+/* ─── Badges ──────────────────────────────────────────────────────────────── */
+.badge {
+  display      : inline-flex;
+  align-items  : center;
+  font-size    : 9px;
+  font-weight  : 700;
+  padding      : 2px 7px;
+  border-radius: 99px;
+}
+.badge-high   { background: var(--red-dim);    color: #fca5a5; border: 1px solid rgba(239,68,68,.35);  }
+.badge-medium { background: var(--yellow-dim); color: #fde68a; border: 1px solid rgba(245,158,11,.35); }
+.badge-low    { background: var(--green-dim);  color: #86efac; border: 1px solid rgba(34,197,94,.35);  }
+.badge-ip     { background: var(--red-dim); color: #fca5a5; border: 1px solid rgba(239,68,68,.35); margin-left: 4px; font-size: 8px; }
+
+/* ─── Colour Themes ───────────────────────────────────────────────────────── */
+.theme-red    .gauge-circle  { border-color: var(--red);    background: var(--red-dim);    }
+.theme-red    .gauge-score,
+.theme-red    .gauge-label   { color: var(--red); }
+.theme-red    .gauge-bar-fill{ background: linear-gradient(90deg, #7f1d1d, var(--red)); }
+.theme-red    #gauge-wrap    { border-color: rgba(239,68,68,.35); }
+
+.theme-yellow .gauge-circle  { border-color: var(--yellow); background: var(--yellow-dim); }
+.theme-yellow .gauge-score,
+.theme-yellow .gauge-label   { color: var(--yellow); }
+.theme-yellow .gauge-bar-fill{ background: linear-gradient(90deg, #78350f, var(--yellow)); }
+.theme-yellow #gauge-wrap    { border-color: rgba(245,158,11,.35); }
+
+.theme-green  .gauge-circle  { border-color: var(--green);  background: var(--green-dim);  }
+.theme-green  .gauge-score,
+.theme-green  .gauge-label   { color: var(--green); }
+.theme-green  .gauge-bar-fill{ background: linear-gradient(90deg, #14532d, var(--green)); }
+.theme-green  #gauge-wrap    { border-color: rgba(34,197,94,.35); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-icon">🛡️</div>
+  <div>
+    <div class="hdr-name">PhishSentinel</div>
+    <div class="hdr-sub">Multi-Engine Threat Detection</div>
+  </div>
+  <span class="version-pill">v2.0</span>
+</div>
+
+<!-- Scan Button -->
+<div class="scan-wrap">
+  <button id="scan-btn">🔍 &nbsp;Scan This Email</button>
+</div>
+<div id="status"></div>
+
+<!-- Escalation Banner -->
+<div class="escalation-badge" id="escalation-badge">
+  ⚡ Critical signal — threat forced to HIGH regardless of other scores.
+</div>
+
+<!-- Threat Score -->
+<div id="gauge-wrap">
+  <div class="gauge-inner">
+    <div class="gauge-circle">
+      <div class="gauge-score" id="gauge-score"></div>
+      <div class="gauge-score-sub">/ 100</div>
+    </div>
+    <div class="gauge-right">
+      <div class="gauge-label" id="gauge-label"></div>
+      <div class="gauge-bar-track">
+        <div class="gauge-bar-fill" id="gauge-fill"></div>
+      </div>
+      <div class="gauge-meta">
+        <span>Safe</span>
+        <span id="scan-time"></span>
+        <span>Critical</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Engine Breakdown -->
+<div id="engines-wrap">
+  <div class="engines-title">Detection Engines</div>
+  <div class="engine-grid">
+
+    <div class="engine-row" id="eng-ml">
+      <div class="engine-top">
+        <span class="engine-name">🤖 ML Model</span>
+        <span class="engine-val">—</span>
+      </div>
+      <div class="engine-bar-track"><div class="engine-bar-fill"></div></div>
+    </div>
+
+    <div class="engine-row" id="eng-domain">
+      <div class="engine-top">
+        <span class="engine-name">🌐 Domain</span>
+        <span class="engine-val">—</span>
+      </div>
+      <div class="engine-bar-track"><div class="engine-bar-fill"></div></div>
+    </div>
+
+    <div class="engine-row" id="eng-heuristic">
+      <div class="engine-top">
+        <span class="engine-name">🔍 Heuristic</span>
+        <span class="engine-val">—</span>
+      </div>
+      <div class="engine-bar-track"><div class="engine-bar-fill"></div></div>
+    </div>
+
+    <div class="engine-row" id="eng-header">
+      <div class="engine-top">
+        <span class="engine-name">📧 Headers</span>
+        <span class="engine-val">—</span>
+      </div>
+      <div class="engine-bar-track"><div class="engine-bar-fill"></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Findings -->
+<div id="findings-wrap">
+  <div class="findings-hdr">Findings</div>
+  <div id="findings-list"></div>
+</div>
+
+<!-- Link Forensics -->
+<div id="links-wrap">
+  <div class="links-hdr">Link Forensics</div>
+  <div class="links-col-hdr">
+    <span>URL</span>
+    <span style="text-align:right">Age</span>
+    <span style="text-align:right">Risk</span>
+  </div>
+  <div class="links-scroll" id="links-body"></div>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
