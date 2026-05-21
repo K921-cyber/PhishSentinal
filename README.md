@@ -31,7 +31,7 @@
 
 ## 1. The Problem PhishSentinel Solves
 
-Traditional anti-phishing tools rely on **reputation blocklists** — databases of known bad domains that are maintained by vendors like Google Safe Browsing or Microsoft SmartScreen. These work well for *old* threats but fail completely for **zero-day phishing**:
+Traditional anti-phishing tools rely on **reputation blocklists** : databases of known bad domains that are maintained by vendors like Google Safe Browsing or Microsoft SmartScreen. These work well for *old* threats but fail completely for **zero-day phishing**:
 
 ```
 Hour 0:  Attacker registers secure-paypa1-login.xyz  ($1 on Namecheap/Godaddy)
