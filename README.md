@@ -79,15 +79,15 @@ PhishSentinel attacks this gap with signals that are visible **from the moment o
 ╔═══════════════════════════════════════════════════════════════════╗
 ║                        CHROME BROWSER                             ║
 ║                                                                   ║
-║  ┌─────────────────────────┐     ┌──────────────────────────┐   ║
-║  │   Gmail / Outlook Web   │     │   PhishSentinel Popup     │   ║
-║  │                         │     │                           │   ║
-║  │  content.js             │◄────│  • Animated threat gauge  │   ║
-║  │  ├─ Extract body text   │     │  • Engine breakdown bars  │   ║
-║  │  ├─ Collect all hrefs   │     │  • Findings feed          │   ║
-║  │  ├─ Unwrap redirects    │     │  • Per-link forensic table│   ║
-║  │  └─ Read auth signals   │     │  • Escalation notice      │   ║
-║  └────────────┬────────────┘     └──────────────────────────┘   ║
+║  ┌─────────────────────────┐     ┌──────────────────────────┐     ║
+║  │   Gmail / Outlook Web   │     │   PhishSentinel Popup     │    ║
+║  │                         │     │                           │    ║
+║  │  content.js             │◄────│  • Animated threat gauge  │    ║
+║  │  ├─ Extract body text   │     │  • Engine breakdown bars  │    ║
+║  │  ├─ Collect all hrefs   │     │  • Findings feed          │    ║
+║  │  ├─ Unwrap redirects    │     │  • Per-link forensic table│    ║
+║  │  └─ Read auth signals   │     │  • Escalation notice      │    ║
+║  └────────────┬────────────┘     └──────────────────────────┘     ║
 ╚══════════════|════════════════════════════════════════════════════╝
                │  POST /api/scan
                │  { text, links[], raw_headers }
