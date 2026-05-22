@@ -1,15 +1,3 @@
-/**
- * PhishSentinel — content.js v2.1
- *
- * ARCHITECTURE CHANGE:
- * content.js no longer calls the backend. It ONLY extracts data from the
- * email DOM and returns it to popup.js instantly via sendResponse().
- *
- * popup.js then does the fetch() to the backend itself.
- * This eliminates the race condition where Chrome closes the message
- * channel while waiting 2-3s for the backend response.
- */
-
 const MAX_LINKS = 30;
 
 const BODY_SELECTORS = [
