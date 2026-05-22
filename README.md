@@ -663,9 +663,9 @@ git push origin feature/add-async-whois
 
 ---
 
-*Built by KAPS — Cybersecurity Researcher*  
+*Built by KABIR — Cybersecurity Researcher*  
 *IndiaSkills Nationals 2025-2026 · Medallion of Excellence · Skill 54: Cyber Security*  
-*Mentored by Nitish Agrawal & Smridh Gupta — Thinknyx Technologies · Shivalik College Dehradun*
+*Shivalik College Dehradun*
 
 ---
 
